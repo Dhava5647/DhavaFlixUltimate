@@ -1,0 +1,48 @@
+/* styles/globals.css */
+:root {
+    --midnight-bg: #101010;
+    --electric-blue: #0072F5;
+    --electric-blue-light: #00C6FF;
+    --text-primary-dark: #FFFFFF;
+    --card-bg-dark: #1a202c;
+}
+html:not(.light) { background-color: var(--midnight-bg); }
+body { background-color: var(--midnight-bg); color: var(--text-primary-dark); font-family: 'Poppins', sans-serif; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; padding-bottom: 60px; }
+
+/* Light Mode Styles */
+html.light body { background-color: #f1f5f9; color: #1e293b; }
+html.light .themed-bg { background-color: #f1f5f9; }
+html.light .themed-text { color: #1e293b; }
+html.light .header-scrolled { background-color: rgba(241, 245, 249, 0.85); border-bottom: 1px solid #e2e8f0; }
+html.light #mobile-menu { background-color: rgba(241, 245, 249, 0.9); }
+html.light #logo-text { fill: #1e293b; }
+html.light .shimmer { background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%); }
+html.light .modal-content, html.light .profile-card, html.light .reminder-item { background-color: #ffffff; }
+html.light .carousel-arrow, html.light #close-video { background-color: rgba(0,0,0,0.5); color: white; }
+html.light .bottom-nav { background-color: #ffffff; border-top: 1px solid #e2e8f0; }
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #000; }
+::-webkit-scrollbar-thumb { background-color: var(--electric-blue); border-radius: 8px; }
+.header-scrolled { background-color: rgba(16, 16, 16, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+.hero-gradient { background: linear-gradient(to top, var(--midnight-bg) 5%, transparent 50%), linear-gradient(to right, rgba(16, 16, 16, 0.9) 0%, transparent 80%); }
+html.light .hero-gradient { background: linear-gradient(to top, #f1f5f9 5%, transparent 50%), linear-gradient(to right, rgba(241, 245, 249, 0.9) 0%, transparent 80%); }
+.hero-text-shadow { text-shadow: 2px 2px 15px rgba(0, 0, 0, 0.9); }
+html.light .hero-text-shadow { text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3); }
+.carousel-container:hover .carousel-arrow { opacity: 1; }
+.carousel-arrow { opacity: 0; transition: opacity 0.3s ease; }
+.carousel-arrow:hover { background-color: rgba(20, 20, 20, 0.8); }
+#mobile-menu { transition: transform 0.3s ease-in-out; background-color: rgba(0,0,0,0.9); backdrop-filter: blur(10px); }
+.movie-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+.group:hover .movie-card { transform: scale(1.05); z-index: 10; box-shadow: 0 0 30px -5px var(--electric-blue); }
+.search-overlay { backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+.nav-link.active { color: var(--electric-blue-light); font-weight: 600; }
+.shimmer { background: linear-gradient(90deg, rgba(255,255,255,0.06) 25%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.06) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+.video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; }
+.video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+.quality-badge { position: absolute; top: 8px; left: 8px; background-color: rgba(0,0,0,0.7); color: white; padding: 2px 6px; font-size: 10px; font-weight: bold; border-radius: 4px; z-index: 5; }
+.reminder-bell.active { color: var(--electric-blue-light); }
+.progress-bar { height: 4px; background-color: var(--electric-blue); }
