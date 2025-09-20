@@ -1,23 +1,43 @@
-// pages/api/tmdb.js
-export default async function handler(req, res) {
-  const { path = 'trending/all/week', params = '' } = req.query;
+// This is our server-side API route.
+// It will receive requests and forward them to the real TMDB API.
 
-  const TMDB_KEY = process.env.TMDB_API_KEY;
-  if (!TMDB_KEY) {
-    return res.status(500).json({ ok:false, message: 'TMDB_API_KEY not set on server.' });
+export default async function handler(req, res) {
+  // Get the API path and any extra parameters from the request URL.
+  // e.g., if the request is for /api/tmdb?path=trending/all/week,
+  // `path` will be 'trending/all/week'.
+  const { path, ...params } = req.query;
+
+  if (!path) {
+    return res.status(400).json({ message: 'API path is required' });
   }
 
-  // Build TMDB URL
-  const base = 'https://api.themoviedb.org/3';
-  // params should already start with & if needed (client code will pass it like "&query=abc")
-  const url = `${base}/${path}?api_key=${encodeURIComponent(TMDB_KEY)}&language=en-US${params}`;
+  // Get the secret API key from our environment variables.
+  // This is much more secure!
+  const apiKey = process.env.TMDB_API_KEY;
+  if (!apiKey) {
+      return res.status(500).json({ message: 'API key is not configured' });
+  }
+
+  // Build the full TMDB API URL.
+  const queryParams = new URLSearchParams(params).toString();
+  const apiUrl = `https://api.themoviedb.org/3/${path}?api_key=${apiKey}&language=en-US&${queryParams}`;
 
   try {
-    const r = await fetch(url);
-    const data = await r.json();
-    res.status(r.ok ? 200 : r.status).json(data);
-  } catch (err) {
-    console.error('tmdb proxy error', err);
-    res.status(500).json({ ok:false, message: 'Proxy error' });
+    // Call the real TMDB API from our server.
+    const apiResponse = await fetch(apiUrl);
+
+    if (!apiResponse.ok) {
+      // If TMDB gives an error, send it back to the user's browser.
+      const errorData = await apiResponse.json();
+      return res.status(apiResponse.status).json(errorData);
+    }
+
+    // If the call was successful, send the data back to the user's browser.
+    const data = await apiResponse.json();
+    res.status(200).json(data);
+
+  } catch (error) {
+    console.error('Proxy API Error:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 }
