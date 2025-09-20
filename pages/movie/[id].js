@@ -89,7 +89,16 @@ export default function MovieDetailsPage() {
                     {recommendations.length > 0 && <div className="mt-12"><h2 className="text-2xl font-bold mb-4">More Like This</h2><div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">{recommendations.slice(0, 12).map(movie => movie.poster_path && (<Link key={movie.id} href={`/movie/${movie.id}`}><a className="group"><Image src={`${IMAGE_BASE_URL}w500${movie.poster_path}`} width={500} height={750} className="rounded-lg group-hover:scale-105 transition-transform duration-300" alt={movie.title}/></a></Link>))}</div></div>}
                 </div>
             </div>
-            {isPlayerOpen && (<div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/90 backdrop-blur-sm animate-fade-in p-4"><div className="w-full max-w-6xl"><div className="flex justify-between items-center mb-4"><h3 className="text-xl font-bold text-white">{details.title}</h3><button onClick={() => setIsPlayerOpen(false)} className="text-white text-4xl leading-none hover:text-electric-blue-light transition-colors">&times;</button></div><div className="aspect-video w-full"><iframe src={`https://www.2embed.cc/embed/${details.id}`} title={`Watch ${details.title}`} frameBorder="0" allowFullScreen className="w-full h-full rounded-lg shadow-2xl bg-black"></iframe></div></div></div>)}
+            {isPlayerOpen && (<div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/90 backdrop-blur-sm animate-fade-in p-4"><div className="w-full max-w-6xl"><div className="flex justify-between items-center mb-4"><h3 className="text-xl font-bold text-white">{details.title}</h3><button onClick={() => setIsPlayerOpen(false)} className="text-white text-4xl leading-none hover:text-electric-blue-light transition-colors">&times;</button></div><div className="aspect-video w-full">
+                <iframe 
+                    src={`https://www.2embed.cc/embed/${details.id}`} 
+                    title={`Watch ${details.title}`} 
+                    frameBorder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen 
+                    className="w-full h-full rounded-lg shadow-2xl bg-black">
+                </iframe>
+            </div></div></div>)}
             {videoKey && <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/80" role="dialog" aria-modal="true"><div className="relative w-full max-w-4xl aspect-video bg-black rounded-lg overflow-hidden"><iframe className="w-full h-full" src={`https://www.youtube.com/embed/${videoKey}?autoplay=1`} title="YouTube video player" frameBorder="0" allow="autoplay; encrypted-media" allowFullScreen></iframe><button onClick={() => setVideoKey(null)} className="absolute top-2 right-2 text-3xl text-white" aria-label="Close video">&times;</button></div></div>}
         </>
     );
