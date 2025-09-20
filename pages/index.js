@@ -320,7 +320,7 @@ function SearchOverlay({ isOpen, onClose, onSearch, results, onPlayTrailer }) {
 
 function MobileMenu({ isOpen, onNavClick, currentView }) {
     return (
-        <div className={`fixed top-0 left-0 h-full w-64 z-40 transform md:hidden ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div id="mobile-menu" className={`fixed top-0 left-0 h-full w-64 z-40 transform md:hidden ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
             <nav className="mt-24 flex flex-col space-y-6 px-6">
                 {[{v:'home', t:'Home'}, {v:'tv', t:'TV Shows'}, {v:'movies', t:'Movies'}, {v:'mylist', t:'My List'}, {v:'profile', t:'Profile'}].map(({v,t}) =>
                     <button key={v} onClick={() => onNavClick(v)} className={`nav-link themed-text text-lg text-left ${currentView === v ? 'active' : ''} ${v === 'profile' ? 'mt-4 border-t border-gray-700 pt-4' : ''}`}>{t}</button>
@@ -418,5 +418,3 @@ function SkeletonLoader() {
         ))
     );
 }
-
-
