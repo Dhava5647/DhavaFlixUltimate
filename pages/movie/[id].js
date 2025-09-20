@@ -13,6 +13,7 @@ export default function MovieDetailsPage() {
     const [recommendations, setRecommendations] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isPlayerOpen, setIsPlayerOpen] = useState(false);
+    const [videoKey, setVideoKey] = useState(null); // State for the trailer modal
 
     useEffect(() => {
         if (!id) return;
@@ -36,14 +37,19 @@ export default function MovieDetailsPage() {
     }, [id]);
     
     useEffect(() => {
-        document.body.style.overflow = isPlayerOpen ? 'hidden' : 'auto';
+        const isModalOpen = isPlayerOpen || videoKey;
+        document.body.style.overflow = isModalOpen ? 'hidden' : 'auto';
         return () => { document.body.style.overflow = 'auto'; };
-    }, [isPlayerOpen]);
+    }, [isPlayerOpen, videoKey]);
+    
+    const playTrailer = () => {
+        const trailer = details.videos?.results?.find(v => v.type === 'Trailer' && v.site === 'YouTube');
+        if (trailer) setVideoKey(trailer.key);
+        else alert('Trailer not available for this movie.');
+    };
 
     if (isLoading) { return <div className="themed-bg min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-t-electric-blue border-gray-700 rounded-full animate-spin"></div></div>; }
     if (!details) { return <div className="themed-bg min-h-screen text-center pt-40">Failed to load movie details.</div>; }
-
-    const trailer = details.videos?.results?.find(v => v.type === 'Trailer' && v.site === 'YouTube');
 
     return (
         <>
@@ -71,40 +77,20 @@ export default function MovieDetailsPage() {
                             </div>
                             <p className="text-base text-gray-300 max-w-2xl">{details.overview}</p>
                             <div className="mt-6 flex flex-col sm:flex-row gap-4">
-                                <button
-                                    onClick={() => setIsPlayerOpen(true)}
-                                    className="flex items-center justify-center bg-electric-blue hover:bg-electric-blue-light text-white font-bold py-3 px-8 rounded-lg transition-transform duration-300 hover:scale-105 text-lg"
-                                >
+                                <button onClick={() => setIsPlayerOpen(true)} className="flex items-center justify-center bg-electric-blue hover:bg-electric-blue-light text-white font-bold py-3 px-8 rounded-lg transition-transform duration-300 hover:scale-105 text-lg">
                                     <svg className="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd"></path></svg>
                                     <span>Watch Now</span>
                                 </button>
+                                <button onClick={playTrailer} className="flex items-center justify-center bg-gray-700/80 font-semibold py-3 px-8 rounded-lg hover:bg-gray-600/70 transition duration-300 hover:scale-105">Watch Trailer</button>
                             </div>
                         </div>
                     </div>
-                    {trailer && <div className="mt-12"><h2 className="text-2xl font-bold mb-4">Trailer</h2><div className="video-container rounded-lg shadow-xl"><iframe src={`https://www.youtube.com/embed/${trailer.key}`} title="Trailer" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe></div></div>}
                     {details.credits?.cast?.length > 0 && <div className="mt-12"><h2 className="text-2xl font-bold mb-4">Top Billed Cast</h2><div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">{details.credits.cast.slice(0, 8).map(person => person.profile_path && (<div key={person.id} className="text-center"><Image src={`${IMAGE_BASE_URL}w185${person.profile_path}`} width={185} height={278} className="rounded-lg" alt={person.name}/><p className="text-sm mt-2 font-bold">{person.name}</p><p className="text-xs text-gray-400">{person.character}</p></div>))}</div></div>}
                     {recommendations.length > 0 && <div className="mt-12"><h2 className="text-2xl font-bold mb-4">More Like This</h2><div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">{recommendations.slice(0, 12).map(movie => movie.poster_path && (<Link key={movie.id} href={`/movie/${movie.id}`}><a className="group"><Image src={`${IMAGE_BASE_URL}w500${movie.poster_path}`} width={500} height={750} className="rounded-lg group-hover:scale-105 transition-transform duration-300" alt={movie.title}/></a></Link>))}</div></div>}
                 </div>
             </div>
-            {isPlayerOpen && (
-                <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/90 backdrop-blur-sm animate-fade-in p-4">
-                    <div className="w-full max-w-6xl">
-                        <div className="flex justify-between items-center mb-4">
-                             <h3 className="text-xl font-bold text-white">{details.title}</h3>
-                             <button onClick={() => setIsPlayerOpen(false)} className="text-white text-4xl leading-none hover:text-electric-blue-light transition-colors">&times;</button>
-                        </div>
-                        <div className="aspect-video w-full">
-                            <iframe
-                                src={`https://multiembed.mov/?video_id=${details.id}&tmdb=1`}
-                                title={`Watch ${details.title}`}
-                                frameBorder="0"
-                                allowFullScreen
-                                className="w-full h-full rounded-lg shadow-2xl bg-black"
-                            ></iframe>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {isPlayerOpen && (<div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/90 backdrop-blur-sm animate-fade-in p-4"><div className="w-full max-w-6xl"><div className="flex justify-between items-center mb-4"><h3 className="text-xl font-bold text-white">{details.title}</h3><button onClick={() => setIsPlayerOpen(false)} className="text-white text-4xl leading-none hover:text-electric-blue-light transition-colors">&times;</button></div><div className="aspect-video w-full"><iframe src={`https://embed.su/embed/movie?tmdb=${details.id}`} title={`Watch ${details.title}`} frameBorder="0" allowFullScreen className="w-full h-full rounded-lg shadow-2xl bg-black"></iframe></div></div></div>)}
+            {videoKey && <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/80" role="dialog" aria-modal="true"><div className="relative w-full max-w-4xl aspect-video bg-black rounded-lg overflow-hidden"><iframe className="w-full h-full" src={`https://www.youtube.com/embed/${videoKey}?autoplay=1`} title="YouTube video player" frameBorder="0" allow="autoplay; encrypted-media" allowFullScreen></iframe><button onClick={() => setVideoKey(null)} className="absolute top-2 right-2 text-3xl text-white" aria-label="Close video">&times;</button></div></div>}
         </>
     );
 }
