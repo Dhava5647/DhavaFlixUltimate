@@ -95,7 +95,7 @@ export default function MovieDetailsPage() {
                         </div>
                         <div className="aspect-video w-full">
                             <iframe
-                                src={`https://player.autoembed.cc/embed/movie/${details.id}`}
+                                src={`https://multiembed.mov/?video_id=${details.id}&tmdb=1`}
                                 title={`Watch ${details.title}`}
                                 frameBorder="0"
                                 allowFullScreen
@@ -108,6 +108,5 @@ export default function MovieDetailsPage() {
         </>
     );
 }
-
 
 
