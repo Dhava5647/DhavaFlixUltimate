@@ -6,7 +6,6 @@ import { useEffect, useState } from 'react';
 
 const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/";
 
-// --- The Final "God Level" Movie Page with vidsrc.xyz ---
 export default function MovieDetailsPage() {
     const router = useRouter();
     const { id } = router.query;
@@ -96,8 +95,7 @@ export default function MovieDetailsPage() {
                         </div>
                         <div className="aspect-video w-full">
                             <iframe
-                                // <<< FINAL ENDPOINT CHANGE >>>
-                                src={`https://vidsrc.xyz/embed/movie/${details.id}`}
+                                src={`https://player.autoembed.cc/embed/movie/${details.id}`}
                                 title={`Watch ${details.title}`}
                                 frameBorder="0"
                                 allowFullScreen
@@ -110,5 +108,6 @@ export default function MovieDetailsPage() {
         </>
     );
 }
+
 
 
