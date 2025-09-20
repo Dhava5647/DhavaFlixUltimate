@@ -13,7 +13,7 @@ export default function MovieDetailsPage() {
     const [recommendations, setRecommendations] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isPlayerOpen, setIsPlayerOpen] = useState(false);
-    const [videoKey, setVideoKey] = useState(null); // State for the trailer modal
+    const [videoKey, setVideoKey] = useState(null);
 
     useEffect(() => {
         if (!id) return;
@@ -77,9 +77,9 @@ export default function MovieDetailsPage() {
                             </div>
                             <p className="text-base text-gray-300 max-w-2xl">{details.overview}</p>
                             <div className="mt-6 flex flex-col sm:flex-row gap-4">
-                                <button onClick={() => setIsPlayerOpen(true)} className="flex items-center justify-center bg-electric-blue hover:bg-electric-blue-light text-white font-bold py-3 px-8 rounded-lg transition-transform duration-300 hover:scale-105 text-lg">
+                                <button onClick={() => setIsPlayerOpen(true)} className="flex items-center justify-center bg-white text-black font-bold py-3 px-8 rounded-lg transition-transform duration-300 hover:scale-105 text-lg">
                                     <svg className="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd"></path></svg>
-                                    <span>Watch Now</span>
+                                    <span>Play</span>
                                 </button>
                                 <button onClick={playTrailer} className="flex items-center justify-center bg-gray-700/80 font-semibold py-3 px-8 rounded-lg hover:bg-gray-600/70 transition duration-300 hover:scale-105">Watch Trailer</button>
                             </div>
