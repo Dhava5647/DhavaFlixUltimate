@@ -15,7 +15,7 @@ export default function TvDetailsPage() {
     const [isPlayerOpen, setIsPlayerOpen] = useState(false);
     const [selectedSeason, setSelectedSeason] = useState(1);
     const [selectedEpisode, setSelectedEpisode] = useState(1);
-    const [videoKey, setVideoKey] = useState(null); // State for the trailer modal
+    const [videoKey, setVideoKey] = useState(null);
 
     useEffect(() => {
         if (!id) return;
@@ -90,7 +90,7 @@ export default function TvDetailsPage() {
                                 <div className="flex flex-col sm:flex-row gap-4 items-center">
                                     <div className="flex-1 w-full"><label htmlFor="season-select" className="block text-sm font-medium text-gray-400 mb-1">Season</label><select id="season-select" value={selectedSeason} onChange={handleSeasonChange} className="w-full bg-gray-800/50 border border-gray-700 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-electric-blue">{details.seasons?.filter(s => s.season_number > 0).map(s => <option key={s.id} value={s.season_number}>{s.name}</option>)}</select></div>
                                     <div className="flex-1 w-full"><label htmlFor="episode-select" className="block text-sm font-medium text-gray-400 mb-1">Episode</label><select id="episode-select" value={selectedEpisode} onChange={(e) => setSelectedEpisode(Number(e.target.value))} className="w-full bg-gray-800/50 border border-gray-700 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-electric-blue">{currentSeasonData && Array.from({ length: currentSeasonData.episode_count }, (_, i) => i + 1).map(ep => <option key={ep} value={ep}>Episode {ep}</option>)}</select></div>
-                                    <div className="w-full sm:w-auto self-end"><button onClick={() => setIsPlayerOpen(true)} className="w-full flex items-center justify-center bg-electric-blue hover:bg-electric-blue-light text-white font-bold py-2 px-6 rounded-lg transition-transform duration-300 hover:scale-105 text-md"><svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd"></path></svg><span>Watch</span></button></div>
+                                    <div className="w-full sm:w-auto self-end"><button onClick={() => setIsPlayerOpen(true)} className="w-full flex items-center justify-center bg-white text-black font-bold py-2 px-6 rounded-lg transition-transform duration-300 hover:scale-105 text-md"><svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd"></path></svg><span>Play</span></button></div>
                                 </div>
                             </div>
                         </div>
@@ -103,7 +103,16 @@ export default function TvDetailsPage() {
                 <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/90 backdrop-blur-sm animate-fade-in p-4">
                     <div className="w-full max-w-6xl">
                         <div className="flex justify-between items-center mb-4"><h3 className="text-xl font-bold text-white">{details.name} (S{selectedSeason} E{selectedEpisode})</h3><button onClick={() => setIsPlayerOpen(false)} className="text-white text-4xl leading-none hover:text-electric-blue-light transition-colors">&times;</button></div>
-                        <div className="aspect-video w-full"><iframe src={`https://www.2embed.cc/embedtv/${details.id}&s=${selectedSeason}&e=${selectedEpisode}`} title={`Watch ${details.name}`} frameBorder="0" allowFullScreen className="w-full h-full rounded-lg shadow-2xl bg-black"></iframe></div>
+                        <div className="aspect-video w-full">
+                            <iframe 
+                                src={`https://www.2embed.cc/embedtv/${details.id}?s=${selectedSeason}&e=${selectedEpisode}&sv=player4u`} 
+                                title={`Watch ${details.name}`} 
+                                frameBorder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen 
+                                className="w-full h-full rounded-lg shadow-2xl bg-black">
+                            </iframe>
+                        </div>
                     </div>
                 </div>
             )}
@@ -111,6 +120,5 @@ export default function TvDetailsPage() {
         </>
     );
 }
-
 
 
