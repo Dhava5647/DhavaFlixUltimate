@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 // This single component contains the entire application logic.
 export default function DhavaFlixApp() {
     // --- STATE MANAGEMENT ---
-    // Data states
     const [myList, setMyList] = useState([]);
     const [continueWatching, setContinueWatching] = useState([]);
     const [reminders, setReminders] = useState([]);
@@ -12,8 +11,6 @@ export default function DhavaFlixApp() {
     const [contentData, setContentData] = useState([]);
     const [searchResults, setSearchResults] = useState([]);
     const [modalDetails, setModalDetails] = useState(null);
-    
-    // UI States
     const [currentView, setCurrentView] = useState('home');
     const [isLoading, setIsLoading] = useState(true);
     const [videoKey, setVideoKey] = useState(null);
@@ -21,11 +18,6 @@ export default function DhavaFlixApp() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isHeaderScrolled, setIsHeaderScrolled] = useState(false);
     const [theme, setTheme] = useState('dark');
-
-    // --- CONFIG ---
-    const apiKey = "0627e9682f6c3eca80da4e2a6217ce57";
-    const apiBaseUrl = "https://api.themoviedb.org/3";
-    const imageBaseUrl = "https://image.tmdb.org/t/p/";
 
     // --- LOCAL STORAGE & THEME INITIALIZATION ---
     useEffect(() => {
@@ -42,8 +34,11 @@ export default function DhavaFlixApp() {
     };
     
     // --- API & UTILITY HELPERS ---
+    // THIS IS THE UPDATED FUNCTION!
     const fetchApi = useCallback(async (path, params = "") => {
-        const url = `${apiBaseUrl}/${path}?api_key=${apiKey}&language=en-US${params}`;
+        // Instead of calling TMDB directly, we call our own API route.
+        const queryParams = new URLSearchParams(params.replace(/^&/, '')).toString();
+        const url = `/api/tmdb?path=${path}&${queryParams}`;
         try {
             const res = await fetch(url);
             if (!res.ok) throw new Error(`API Error: ${res.status}`);
@@ -331,7 +326,7 @@ export default function DhavaFlixApp() {
     const HeroSection = ({ item }) => (
         <section className="relative min-h-[50vh] md:min-h-[calc(85vh-5rem)] flex items-center justify-center">
             <div className="absolute inset-0">
-                <img src={`${imageBaseUrl}w1280${item.backdrop_path}`} className="w-full h-full object-cover object-top" alt={item.title || item.name} />
+                <img src={`https://image.tmdb.org/t/p/w1280${item.backdrop_path}`} className="w-full h-full object-cover object-top" alt={item.title || item.name} />
                 <div className="absolute inset-0 hero-gradient"></div>
             </div>
             <div className="relative z-10 flex flex-col justify-end h-full w-full max-w-7xl px-4 sm:px-6 lg:px-8 pb-10 md:pb-0 md:justify-center">
@@ -367,6 +362,7 @@ export default function DhavaFlixApp() {
     };
 
     const ItemCard = ({ item, type }) => {
+        const imageBaseUrl = "https://image.tmdb.org/t/p/";
         const itemType = type || item.type || (item.title ? 'movie' : 'tv');
         
         if (currentView === 'comingsoon') {
@@ -419,7 +415,7 @@ export default function DhavaFlixApp() {
              <div className="fixed inset-0 z-[60] bg-black/80 search-overlay">
                  <div className="container mx-auto px-4 pt-24">
                      <button onClick={() => setIsSearchOpen(false)} className="absolute top-8 right-8 text-4xl">&times;</button>
-                     <input type="text" onChange={(e) => handleSearch(e.target.value)} className="w-full bg-transparent border-b-2 border-electric-blue text-2xl md:text-5xl focus:outline-none" placeholder="Search movies, TV shows..." autoFocus />
+                     <input type="text" onChange={(e) => handleSearch(e.target.value)} className="w-full bg-transparent border-b-2 border-electric-blue text-2xl md:text-5xl focus-outline-none" placeholder="Search movies, TV shows..." autoFocus />
                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mt-8 max-h-[70vh] overflow-y-auto scrollbar-hide">
                         {searchResults.map(item => <ItemCard key={item.id} item={item} />)}
                      </div>
@@ -434,7 +430,8 @@ export default function DhavaFlixApp() {
         const type = details.title ? 'movie' : 'tv';
         const trailer = details.videos?.results.find(v => v.site === 'YouTube' && v.type === 'Trailer');
         const isInList = myList.some(i => i.id === details.id);
-        
+        const imageBaseUrl = "https://image.tmdb.org/t/p/";
+
         return (
             <div className="fixed inset-0 z-[100] overflow-y-auto">
                 <div className="fixed inset-0 bg-black/80" onClick={() => setModalDetails(null)}></div>
