@@ -6,7 +6,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/";
 
 // --- Main App Component ---
-// This is the final, stable version that links to the new dedicated details pages.
+// This is the final, stable version with more content sections and all bug fixes.
 export default function DhavaFlixApp() {
     const [myList, setMyList] = useState([]);
     const [continueWatching, setContinueWatching] = useState([]);
@@ -77,12 +77,14 @@ export default function DhavaFlixApp() {
     }, []);
 
     useEffect(() => {
+        // This object now contains many more categories for a richer experience.
         const viewConfigs = {
             home: {
                 heroEndpoint: 'trending/all/week',
                 categories: [
                     { title: "Trending This Week", endpoint: "trending/all/week" },
                     { title: "Popular in India", endpoint: "discover/movie", params: "&region=IN&sort_by=popularity.desc&with_original_language=hi|te|ta" },
+                    { title: "Popular TV Shows", endpoint: "tv/popular", params: "&region=IN" },
                     { title: "Top Rated Movies", endpoint: "movie/top_rated" }
                 ],
                 showContinueWatching: true
@@ -90,9 +92,11 @@ export default function DhavaFlixApp() {
             movies: {
                 heroEndpoint: 'movie/popular',
                 categories: [
-                    { title: "Now Playing", endpoint: "movie/now_playing", params: "&region=IN" },
+                    { title: "Now Playing in Theaters", endpoint: "movie/now_playing", params: "&region=IN" },
+                    { title: "Action Movies", endpoint: "discover/movie", params: "&with_genres=28" },
+                    { title: "Comedies", endpoint: "discover/movie", params: "&with_genres=35" },
+                    { title: "Horror", endpoint: "discover/movie", params: "&with_genres=27" },
                     { title: "Top Rated", endpoint: "movie/top_rated" },
-                    { title: "Popular", endpoint: "movie/popular" },
                     { title: "Upcoming", endpoint: "movie/upcoming", params: "&region=IN" }
                 ]
             },
@@ -100,8 +104,11 @@ export default function DhavaFlixApp() {
                 heroEndpoint: 'tv/popular',
                 categories: [
                     { title: "Airing Today", endpoint: "tv/airing_today" },
-                    { title: "Top Rated", endpoint: "tv/top_rated" },
-                    { title: "Popular", endpoint: "tv/popular" }
+                    { title: "Animation", endpoint: "discover/tv", params: "&with_genres=16" },
+                    { title: "Crime Dramas", endpoint: "discover/tv", params: "&with_genres=80" },
+                    { title: "Documentaries", endpoint: "discover/tv", params: "&with_genres=99" },
+                    { title: "Sci-Fi & Fantasy", endpoint: "discover/tv", params: "&with_genres=10765" },
+                    { title: "Top Rated Shows", endpoint: "tv/top_rated" }
                 ]
             }
         };
@@ -151,7 +158,8 @@ export default function DhavaFlixApp() {
             <Head>
                 <title>DhavaFlix – Watch Movies & Webseries</title>
                 <meta name="description" content="A Netflix-style streaming site to explore the latest movies and TV shows."/>
-                <link rel="icon" href="/favicon.ico" /> {/* Correct Favicon Link */}
+                {/* FAVICON FIX */}
+                <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎬</text></svg>" />
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
                 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
