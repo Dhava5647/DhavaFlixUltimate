@@ -6,15 +6,13 @@ import { useEffect, useState } from 'react';
 
 const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/";
 
-// --- The Final "God Level" Movie Page ---
+// --- The Final "God Level" Movie Page with vidsrc.xyz ---
 export default function MovieDetailsPage() {
     const router = useRouter();
     const { id } = router.query;
     const [details, setDetails] = useState(null);
     const [recommendations, setRecommendations] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    
-    // NEW STATE: This controls the integrated player modal
     const [isPlayerOpen, setIsPlayerOpen] = useState(false);
 
     useEffect(() => {
@@ -38,17 +36,10 @@ export default function MovieDetailsPage() {
         fetchDetails();
     }, [id]);
     
-    // This effect handles locking the background scroll when the player is open
     useEffect(() => {
-        if (isPlayerOpen) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = 'auto';
-        }
-        // Cleanup function to reset scroll on component unmount
+        document.body.style.overflow = isPlayerOpen ? 'hidden' : 'auto';
         return () => { document.body.style.overflow = 'auto'; };
     }, [isPlayerOpen]);
-
 
     if (isLoading) { return <div className="themed-bg min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-t-electric-blue border-gray-700 rounded-full animate-spin"></div></div>; }
     if (!details) { return <div className="themed-bg min-h-screen text-center pt-40">Failed to load movie details.</div>; }
@@ -80,8 +71,6 @@ export default function MovieDetailsPage() {
                                 <span className="flex items-center"><svg className="w-4 h-4 text-yellow-400 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>{details.vote_average?.toFixed(1) || 'N/A'}</span>
                             </div>
                             <p className="text-base text-gray-300 max-w-2xl">{details.overview}</p>
-
-                            {/* <<< BUTTON IS NOW A <button> THAT OPENS THE PLAYER >>> */}
                             <div className="mt-6 flex flex-col sm:flex-row gap-4">
                                 <button
                                     onClick={() => setIsPlayerOpen(true)}
@@ -98,8 +87,6 @@ export default function MovieDetailsPage() {
                     {recommendations.length > 0 && <div className="mt-12"><h2 className="text-2xl font-bold mb-4">More Like This</h2><div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">{recommendations.slice(0, 12).map(movie => movie.poster_path && (<Link key={movie.id} href={`/movie/${movie.id}`}><a className="group"><Image src={`${IMAGE_BASE_URL}w500${movie.poster_path}`} width={500} height={750} className="rounded-lg group-hover:scale-105 transition-transform duration-300" alt={movie.title}/></a></Link>))}</div></div>}
                 </div>
             </div>
-
-            {/* <<< NEW INTEGRATED PLAYER MODAL >>> */}
             {isPlayerOpen && (
                 <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/90 backdrop-blur-sm animate-fade-in p-4">
                     <div className="w-full max-w-6xl">
@@ -109,7 +96,8 @@ export default function MovieDetailsPage() {
                         </div>
                         <div className="aspect-video w-full">
                             <iframe
-                                src={`https://embed.su/embed/movie/${details.id}`}
+                                // <<< FINAL ENDPOINT CHANGE >>>
+                                src={`https://vidsrc.xyz/embed/movie/${details.id}`}
                                 title={`Watch ${details.title}`}
                                 frameBorder="0"
                                 allowFullScreen
