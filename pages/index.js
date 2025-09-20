@@ -5,7 +5,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/";
 
 // --- Main App Component ---
-// This has been rewritten from scratch to be more stable and fix all reported bugs.
+// This version includes the missing 'debounce' function to fix the Vercel build error.
 export default function DhavaFlixApp() {
     // --- State Management ---
     const [myList, setMyList] = useState([]);
@@ -43,6 +43,16 @@ export default function DhavaFlixApp() {
         } catch (error) {
             console.error("Error saving to localStorage", error);
         }
+    };
+
+    // --- Utility Helpers ---
+    // THIS IS THE MISSING FUNCTION THAT IS NOW ADDED
+    const debounce = (func, delay) => {
+        let timeout;
+        return (...args) => {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), delay);
+        };
     };
 
     // --- API Helper using the Vercel Proxy ---
