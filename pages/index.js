@@ -6,14 +6,14 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/";
 
 // --- Main App Component ---
-// This is the final, stable version that links to the new dedicated details pages.
+// This is the final, stable version with direct play functionality.
 export default function DhavaFlixApp() {
     const [myList, setMyList] = useState([]);
     const [continueWatching, setContinueWatching] = useState([]);
     const [heroItem, setHeroItem] = useState(null);
     const [contentData, setContentData] = useState([]);
     const [searchResults, setSearchResults] = useState([]);
-    const [videoKey, setVideoKey] = useState(null);
+    const [streamingItem, setStreamingItem] = useState(null); // NEW: State for the direct player
     const [currentView, setCurrentView] = useState('home');
     const [isLoading, setIsLoading] = useState(true);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -87,17 +87,14 @@ export default function DhavaFlixApp() {
     }, [currentView, fetchAndSetContent]);
     
     // --- Event Handlers ---
-    const handlePlayTrailer = useCallback(async (item) => {
+    const handlePlayNow = useCallback((item) => {
         setContinueWatching(currentCw => {
             const newCw = [item, ...currentCw.filter(i => i.id !== item.id)].slice(0, 20);
             saveToLocalStorage('dhavaflixContinueWatching', newCw);
             return newCw;
         });
-        const data = await fetchApi(`${item.type}/${item.id}/videos`);
-        const trailer = data?.results?.find(v => v.type === "Trailer" && v.site === "YouTube");
-        if (trailer) setVideoKey(trailer.key);
-        else alert("Trailer not available for this title.");
-    }, [fetchApi]);
+        setStreamingItem(item);
+    }, []);
 
     const debounce = (func, delay) => { let timeout; return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); }; };
     const debouncedSearch = useCallback(debounce(async (query) => {
@@ -127,7 +124,7 @@ export default function DhavaFlixApp() {
             <Head>
                 <title>DhavaFlix – Watch Movies & Webseries</title>
                 <meta name="description" content="A Netflix-style streaming site to explore the latest movies and TV shows."/>
-                <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+                <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎬</text></svg>" />
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
                 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -136,12 +133,12 @@ export default function DhavaFlixApp() {
                 <Header isScrolled={isHeaderScrolled} onNavClick={updateView} currentView={currentView} onSearchClick={() => setIsSearchOpen(true)} onThemeToggle={toggleTheme} theme={theme} onMobileMenuClick={() => setIsMobileMenuOpen(o => !o)} />
                 <MobileMenu isOpen={isMobileMenuOpen} onNavClick={updateView} currentView={currentView} />
                 <main className="pt-20">
-                    <MainContent currentView={currentView} isLoading={isLoading} heroItem={heroItem} contentData={contentData} myList={myList} onPlayTrailer={handlePlayTrailer} />
+                    <MainContent currentView={currentView} isLoading={isLoading} heroItem={heroItem} contentData={contentData} myList={myList} onPlayNow={handlePlayNow} />
                 </main>
                 <Footer onNavClick={updateView} />
                 <BottomNav onNavClick={updateView} currentView={currentView} />
-                <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} onSearch={debouncedSearch} results={searchResults} onPlayTrailer={handlePlayTrailer} />
-                {videoKey && <VideoModal videoKey={videoKey} onClose={() => setVideoKey(null)} />}
+                <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} onSearch={debouncedSearch} results={searchResults} onPlayNow={handlePlayNow} />
+                {streamingItem && <StreamingPlayer item={streamingItem} onClose={() => setStreamingItem(null)} />}
             </div>
         </>
     );
@@ -149,7 +146,7 @@ export default function DhavaFlixApp() {
 
 // --- Sub-Components ---
 
-function MainContent({ currentView, isLoading, heroItem, contentData, myList, onPlayTrailer }) {
+function MainContent({ currentView, isLoading, heroItem, contentData, myList, onPlayNow }) {
     if (isLoading && !['mylist', 'profile'].includes(currentView)) {
         return (
             <>
@@ -158,25 +155,26 @@ function MainContent({ currentView, isLoading, heroItem, contentData, myList, on
             </>
         );
     }
-    if (currentView === 'mylist') return <ListPage title="My List" items={myList} onPlayTrailer={onPlayTrailer} />;
+    if (currentView === 'mylist') return <ListPage title="My List" items={myList} onPlayNow={onPlayNow} />;
     if (currentView === 'profile') return <ProfilePage />;
+
     return (
         <>
-            {heroItem && <HeroSection item={heroItem} onPlayTrailer={onPlayTrailer}/>}
+            {heroItem && <HeroSection item={heroItem} onPlayNow={onPlayNow}/>}
             <div className="py-8 md:py-12 space-y-8 md:space-y-12">
-                {contentData.map(row => <ContentRow key={row.title} row={row} onPlayTrailer={onPlayTrailer}/>)}
+                {contentData.map(row => <ContentRow key={row.title} row={row} onPlayNow={onPlayNow}/>)}
             </div>
         </>
     );
 }
 
-function ListPage({ title, items, onPlayTrailer }) {
+function ListPage({ title, items, onPlayNow }) {
     return (
         <div className="px-4 sm:px-6 lg:px-8 pt-8 min-h-screen">
             <h1 className="text-2xl md:text-4xl font-bold mb-6">{title}</h1>
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
                 {items.length > 0
-                    ? items.map(item => <ItemCard key={item.id} item={item} onPlayTrailer={onPlayTrailer} />)
+                    ? items.map(item => <ItemCard key={item.id} item={item} onPlayNow={onPlayNow} />)
                     : <p className="col-span-full themed-text text-center py-10">🎬 This list is empty.</p>
                 }
             </div>
@@ -209,7 +207,7 @@ function Header({ isScrolled, onNavClick, currentView, onSearchClick, onThemeTog
     );
 }
 
-function HeroSection({ item, onPlayTrailer }) {
+function HeroSection({ item, onPlayNow }) {
     const itemType = item.media_type || (item.title ? 'movie' : 'tv');
     const fullItem = {...item, type: itemType, title: item.title || item.name };
     const detailUrl = `/${itemType}/${item.id}`;
@@ -224,7 +222,7 @@ function HeroSection({ item, onPlayTrailer }) {
                 <h2 className="text-3xl md:text-6xl font-bold hero-text-shadow">{fullItem.title}</h2>
                 <p className="mt-4 text-sm md:text-lg max-w-lg hero-text-shadow line-clamp-2 md:line-clamp-3">{item.overview}</p>
                 <div className="mt-6 flex space-x-4">
-                    <button onClick={() => onPlayTrailer(fullItem)} className="bg-white text-black font-semibold py-2 px-5 rounded flex items-center hover:bg-gray-200 transition duration-300 hover:scale-105">Play Trailer</button>
+                    <button onClick={() => onPlayNow(fullItem)} className="bg-white text-black font-semibold py-2 px-5 rounded flex items-center hover:bg-gray-200 transition duration-300 hover:scale-105">▶ Play</button>
                     <Link href={detailUrl}><a className="bg-gray-700/80 font-semibold py-2 px-5 rounded flex items-center hover:bg-gray-600/70 transition duration-300 hover:scale-105">More Info</a></Link>
                 </div>
             </div></div>
@@ -232,14 +230,14 @@ function HeroSection({ item, onPlayTrailer }) {
     );
 }
 
-function ContentRow({ row, onPlayTrailer }) {
+function ContentRow({ row, onPlayNow }) {
     const rowRef = useRef(null);
     const scroll = (amount) => rowRef.current?.scrollBy({ left: amount, behavior: 'smooth' });
     return (
         <div className="carousel-category"><h2 className="text-lg sm:text-2xl font-bold mb-3 md:mb-4 px-4 sm:px-6 lg:px-8">{row.title}</h2>
             <div className="carousel-container relative">
                 <div ref={rowRef} className="carousel-wrapper flex overflow-x-auto pb-4 scrollbar-hide px-4 sm:px-6 lg:px-8 space-x-4">
-                    {row.items.map(item => item.poster_path && <ItemCard key={item.id} item={item} onPlayTrailer={onPlayTrailer}/>)}
+                    {row.items.map(item => item.poster_path && <ItemCard key={item.id} item={item} onPlayNow={onPlayNow}/>)}
                 </div>
                 <button onClick={() => scroll(-rowRef.current.clientWidth)} className="carousel-arrow left-2 absolute top-0 bottom-0 px-4 bg-black/50 hidden md:flex items-center z-20 rounded-l-lg" aria-label="Scroll Left">&#9664;</button>
                 <button onClick={() => scroll(rowRef.current.clientWidth)} className="carousel-arrow right-2 absolute top-0 bottom-0 px-4 bg-black/50 hidden md:flex items-center z-20 rounded-r-lg" aria-label="Scroll Right">&#9654;</button>
@@ -248,7 +246,7 @@ function ContentRow({ row, onPlayTrailer }) {
     );
 }
 
-function ItemCard({ item, onPlayTrailer }) {
+function ItemCard({ item, onPlayNow }) {
     const itemType = item.media_type || (item.title ? 'movie' : 'tv') || item.type || 'movie';
     const fullItem = {...item, type: itemType, title: item.title || item.name };
     const detailUrl = `/${itemType}/${item.id}`;
@@ -260,25 +258,35 @@ function ItemCard({ item, onPlayTrailer }) {
             </div>
             <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex flex-col items-center justify-center p-2 text-center z-20">
                 <h3 className="font-bold text-sm mb-3">{fullItem.title}</h3>
-                <button onClick={() => onPlayTrailer(fullItem)} className="w-full bg-white text-black text-sm font-semibold py-2 rounded mb-2 transition hover:scale-105">▶ Play Trailer</button>
+                <button onClick={() => onPlayNow(fullItem)} className="w-full bg-white text-black text-sm font-semibold py-2 rounded mb-2 transition hover:scale-105">▶ Play</button>
                 <Link href={detailUrl}><a className="w-full bg-gray-700/80 text-sm font-semibold py-2 rounded transition hover:scale-105 block">ℹ More Info</a></Link>
             </div>
         </div>
     );
 }
 
-function VideoModal({ videoKey, onClose }) {
+function StreamingPlayer({ item, onClose }) {
+    const isMovie = item.type === 'movie';
+    const playerUrl = isMovie 
+        ? `https://embed.su/embed/movie/${item.id}`
+        : `https://embed.su/embed/tv/${item.id}`; // Default to S1 E1
+
     return (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/80" role="dialog" aria-modal="true">
-            <div className="relative w-full max-w-4xl aspect-video bg-black rounded-lg overflow-hidden">
-                <iframe className="w-full h-full" src={`https://www.youtube.com/embed/${videoKey}?autoplay=1`} title="YouTube video player" frameBorder="0" allow="autoplay; encrypted-media" allowFullScreen></iframe>
-                <button onClick={onClose} className="absolute top-2 right-2 text-3xl text-white" aria-label="Close video">&times;</button>
+        <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/90 backdrop-blur-sm animate-fade-in p-4">
+            <div className="w-full max-w-6xl">
+                <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-xl font-bold text-white">{item.title}</h3>
+                    <button onClick={onClose} className="text-white text-4xl leading-none hover:text-electric-blue-light transition-colors">&times;</button>
+                </div>
+                <div className="aspect-video w-full">
+                    <iframe src={playerUrl} title={`Watch ${item.title}`} frameBorder="0" allowFullScreen className="w-full h-full rounded-lg shadow-2xl bg-black"></iframe>
+                </div>
             </div>
         </div>
     );
 }
 
-function SearchOverlay({ isOpen, onClose, onSearch, results, onPlayTrailer }) {
+function SearchOverlay({ isOpen, onClose, onSearch, results, onPlayNow }) {
     if(!isOpen) return null;
     return (
          <div className="fixed inset-0 z-[60] bg-black/80 search-overlay">
@@ -286,12 +294,15 @@ function SearchOverlay({ isOpen, onClose, onSearch, results, onPlayTrailer }) {
                  <button onClick={onClose} className="absolute top-8 right-8 text-4xl">&times;</button>
                  <input type="text" onChange={(e) => onSearch(e.target.value)} className="w-full bg-transparent border-b-2 border-electric-blue text-2xl md:text-5xl focus:outline-none" placeholder="Search movies, TV shows..." autoFocus />
                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mt-8 max-h-[70vh] overflow-y-auto scrollbar-hide">
-                    {results.map(item => <ItemCard key={item.id} item={item} onPlayTrailer={onPlayTrailer} />)}
+                    {results.map(item => <ItemCard key={item.id} item={item} onPlayNow={onPlayNow} />)}
                  </div>
              </div>
          </div>
     );
 }
+
+// ... other components like Footer, MobileMenu, BottomNav, etc. remain the same ...
+// (For brevity, only the changed components are shown, but the full file should be used)
 
 function MobileMenu({ isOpen, onNavClick, currentView }) {
     return (
@@ -393,5 +404,3 @@ function SkeletonLoader() {
         ))
     );
 }
-
-
