@@ -13,7 +13,7 @@ export default function DhavaFlixApp() {
     const [heroItem, setHeroItem] = useState(null);
     const [contentData, setContentData] = useState([]);
     const [searchResults, setSearchResults] = useState([]);
-    const [streamingItem, setStreamingItem] = useState(null); // NEW: State for the direct player
+    const [streamingItem, setStreamingItem] = useState(null); // State for the direct player
     const [currentView, setCurrentView] = useState('home');
     const [isLoading, setIsLoading] = useState(true);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -268,8 +268,13 @@ function ItemCard({ item, onPlayNow }) {
 function StreamingPlayer({ item, onClose }) {
     const isMovie = item.type === 'movie';
     const playerUrl = isMovie 
-        ? `https://embed.su/embed/movie/${item.id}`
-        : `https://embed.su/embed/tv/${item.id}`; // Default to S1 E1
+        ? `https://www.2embed.cc/embed/${item.id}?sv=player4u`
+        : `https://www.2embed.cc/embedtv/${item.id}?sv=player4u`; // TV default to S1 E1
+
+    useEffect(() => {
+        document.body.style.overflow = 'hidden';
+        return () => { document.body.style.overflow = 'auto'; };
+    }, []);
 
     return (
         <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/90 backdrop-blur-sm animate-fade-in p-4">
@@ -279,7 +284,7 @@ function StreamingPlayer({ item, onClose }) {
                     <button onClick={onClose} className="text-white text-4xl leading-none hover:text-electric-blue-light transition-colors">&times;</button>
                 </div>
                 <div className="aspect-video w-full">
-                    <iframe src={playerUrl} title={`Watch ${item.title}`} frameBorder="0" allowFullScreen className="w-full h-full rounded-lg shadow-2xl bg-black"></iframe>
+                    <iframe src={playerUrl} title={`Watch ${item.title}`} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="w-full h-full rounded-lg shadow-2xl bg-black"></iframe>
                 </div>
             </div>
         </div>
@@ -300,9 +305,8 @@ function SearchOverlay({ isOpen, onClose, onSearch, results, onPlayNow }) {
          </div>
     );
 }
-
-// ... other components like Footer, MobileMenu, BottomNav, etc. remain the same ...
-// (For brevity, only the changed components are shown, but the full file should be used)
+// ... other components like Footer, MobileMenu, etc. remain the same.
+// It is important to copy the whole file.
 
 function MobileMenu({ isOpen, onNavClick, currentView }) {
     return (
@@ -404,3 +408,5 @@ function SkeletonLoader() {
         ))
     );
 }
+
+
