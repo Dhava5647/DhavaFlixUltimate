@@ -6,7 +6,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/";
 
 // --- Main App Component ---
-// This is the final, stable version with direct play functionality.
+// This is the final, stable version with direct play functionality and all bug fixes.
 export default function DhavaFlixApp() {
     const [myList, setMyList] = useState([]);
     const [continueWatching, setContinueWatching] = useState([]);
@@ -124,7 +124,7 @@ export default function DhavaFlixApp() {
             <Head>
                 <title>DhavaFlix – Watch Movies & Webseries</title>
                 <meta name="description" content="A Netflix-style streaming site to explore the latest movies and TV shows."/>
-                <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎬</text></svg>" />
+                <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
                 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -305,8 +305,6 @@ function SearchOverlay({ isOpen, onClose, onSearch, results, onPlayNow }) {
          </div>
     );
 }
-// ... other components like Footer, MobileMenu, etc. remain the same.
-// It is important to copy the whole file.
 
 function MobileMenu({ isOpen, onNavClick, currentView }) {
     return (
