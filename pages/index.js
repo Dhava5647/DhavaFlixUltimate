@@ -6,7 +6,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/";
 
 // --- Main App Component ---
-// This is the final, stable version with direct play functionality and all bug fixes.
+// This is the final, stable version with the correct vidsrc.pk player.
 export default function DhavaFlixApp() {
     const [myList, setMyList] = useState([]);
     const [continueWatching, setContinueWatching] = useState([]);
@@ -268,8 +268,8 @@ function ItemCard({ item, onPlayNow }) {
 function StreamingPlayer({ item, onClose }) {
     const isMovie = item.type === 'movie';
     const playerUrl = isMovie 
-        ? `https://www.2embed.cc/embed/${item.id}?sv=player4u`
-        : `https://www.2embed.cc/embedtv/${item.id}?sv=player4u`; // TV default to S1 E1
+        ? `https://embed.vidsrc.pk/movie/${item.id}`
+        : `https://embed.vidsrc.pk/tv/${item.id}`; // TV will default to S1 E1 on this source
 
     useEffect(() => {
         document.body.style.overflow = 'hidden';
