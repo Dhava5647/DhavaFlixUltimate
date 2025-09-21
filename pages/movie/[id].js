@@ -13,7 +13,7 @@ export default function MovieDetailsPage() {
     const [recommendations, setRecommendations] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isPlayerOpen, setIsPlayerOpen] = useState(false);
-    const [videoKey, setVideoKey] = useState(null);
+    const [videoKey, setVideoKey] = useState(null); // State for the trailer modal
 
     useEffect(() => {
         if (!id) return;
@@ -91,7 +91,7 @@ export default function MovieDetailsPage() {
             </div>
             {isPlayerOpen && (<div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/90 backdrop-blur-sm animate-fade-in p-4"><div className="w-full max-w-6xl"><div className="flex justify-between items-center mb-4"><h3 className="text-xl font-bold text-white">{details.title}</h3><button onClick={() => setIsPlayerOpen(false)} className="text-white text-4xl leading-none hover:text-electric-blue-light transition-colors">&times;</button></div><div className="aspect-video w-full">
                 <iframe 
-                    src={`https://www.2embed.cc/embed/${details.id}?sv=player4u`} 
+                    src={`https://embed.vidsrc.pk/movie/${details.id}`} 
                     title={`Watch ${details.title}`} 
                     frameBorder="0" 
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
