@@ -15,7 +15,7 @@ export default function TvDetailsPage() {
     const [isPlayerOpen, setIsPlayerOpen] = useState(false);
     const [selectedSeason, setSelectedSeason] = useState(1);
     const [selectedEpisode, setSelectedEpisode] = useState(1);
-    const [videoKey, setVideoKey] = useState(null);
+    const [videoKey, setVideoKey] = useState(null); // State for the trailer modal
 
     useEffect(() => {
         if (!id) return;
@@ -105,7 +105,7 @@ export default function TvDetailsPage() {
                         <div className="flex justify-between items-center mb-4"><h3 className="text-xl font-bold text-white">{details.name} (S{selectedSeason} E{selectedEpisode})</h3><button onClick={() => setIsPlayerOpen(false)} className="text-white text-4xl leading-none hover:text-electric-blue-light transition-colors">&times;</button></div>
                         <div className="aspect-video w-full">
                             <iframe 
-                                src={`https://www.2embed.cc/embedtv/${details.id}?s=${selectedSeason}&e=${selectedEpisode}&sv=player4u`} 
+                                src={`https://embed.vidsrc.pk/tv/${details.id}?s=${selectedSeason}&e=${selectedEpisode}`}
                                 title={`Watch ${details.name}`} 
                                 frameBorder="0" 
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
