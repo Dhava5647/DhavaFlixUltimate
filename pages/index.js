@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 
 // --- Constants ---
 const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/";
-const SITE_URL = "https://dhavaflix.vercel.app"; // Your website URL
+const SITE_URL = "https://dhavaflix.vercel.app"; // Your final website URL
 
 // --- Main App Component ---
 // This is the final, stable version with correct link previews.
@@ -119,10 +119,10 @@ export default function DhavaFlixApp() {
                 <meta name="description" content="A Netflix-style streaming site to explore the latest movies and TV shows, complete with trailers, ratings, and personalized lists."/>
                 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
                 
-                {/* --- Open Graph Meta Tags for Link Previews --- */}
+                {/* --- Open Graph Meta Tags for Link Previews (FIXED) --- */}
                 <meta property="og:title" content="DhavaFlix – Watch Movies & Webseries" />
                 <meta property="og:description" content="A Netflix-style streaming site to explore the latest movies and TV shows." />
-                <meta property="og:image" content="https://i.imgur.com/392o636.png" />
+                <meta property="og:image" content="https://i.imgur.com/5v2a22a.png" />
                 <meta property="og:url" content={SITE_URL} />
                 <meta property="og:type" content="website" />
                 <meta name="twitter:card" content="summary_large_image" />
@@ -145,7 +145,7 @@ export default function DhavaFlixApp() {
         </>
     );
 }
-//... The rest of the sub-components remain the same. Make sure to replace the entire file.
+//... The rest of the sub-components remain the same.
 function MainContent({ currentView, isLoading, heroItem, contentData, myList, onPlayNow }) {
     if (isLoading && !['mylist', 'profile'].includes(currentView)) {
         return (<><section className="relative min-h-[50vh] md:min-h-[calc(85vh-5rem)] flex items-center justify-center themed-bg shimmer"></section><div className="py-8 md:py-12 space-y-8 md:space-y-12"><SkeletonLoader /></div></>);
