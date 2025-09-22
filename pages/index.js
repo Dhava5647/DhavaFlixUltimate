@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 
 // --- Constants ---
 const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/";
-const SITE_URL = "https://dhava-flix-ultimate.vercel.app"; // Replace if you get a custom domain
+const SITE_URL = "https://dhavaflix.vercel.app"; // Your website URL
 
 // --- Main App Component ---
 // This is the final, stable version with correct link previews.
