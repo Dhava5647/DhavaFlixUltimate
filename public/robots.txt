@@ -1,3 +1,4 @@
 User-agent: *
-Sitemap: https://www.google.com/search?q=https://dhavaflix.vercel.app/sitemap.xml
+Allow: /
 
+Sitemap: https://dhavaflix.vercel.app/sitemap.xml
