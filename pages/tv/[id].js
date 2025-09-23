@@ -55,8 +55,7 @@ export default function TvDetailsPage() {
         else alert('Trailer not available for this show.');
     };
 
-    if (isLoading) { return <div className="themed-bg min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-t-electric-blue border-gray-700 rounded-full animate-spin"></div></div>; }
-    if (!details) { return <div className="themed-bg min-h-screen text-center pt-40">Failed to load show details.</div>; }
+    if (isLoading || !details) { return <div className="themed-bg min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-t-electric-blue border-gray-700 rounded-full animate-spin"></div></div>; }
 
     const currentSeasonData = details.seasons?.find(s => s.season_number === selectedSeason);
 
@@ -66,11 +65,15 @@ export default function TvDetailsPage() {
                 <title>{details.name} – DhavaFlix</title>
                 <meta name="description" content={details.overview.substring(0, 160) + '...'} />
                 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+                {/* --- Dynamic Open Graph Meta Tags for Link Previews --- */}
                 <meta property="og:title" content={`${details.name} – DhavaFlix`} />
                 <meta property="og:description" content={details.overview.substring(0, 160) + '...'} />
                 <meta property="og:image" content={`${IMAGE_BASE_URL}w500${details.poster_path}`} />
+                <meta property="og:url" content={`https://dhavaflix.vercel.app/tv/${id}`} />
             </Head>
             <div className="themed-bg min-h-screen">
+                {/* ... rest of the component is the same */}
                 <div className="relative h-[50vh] md:h-[60vh]">
                      {details.backdrop_path && <Image src={`${IMAGE_BASE_URL}w1280${details.backdrop_path}`} alt={details.name} layout="fill" objectFit="cover" className="opacity-40"/>}
                     <div className="absolute inset-0 bg-gradient-to-t from-midnight-bg"></div>
@@ -102,23 +105,7 @@ export default function TvDetailsPage() {
                     {recommendations.length > 0 && <div className="mt-12"><h2 className="text-2xl font-bold mb-4">More Like This</h2><div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">{recommendations.slice(0, 12).map(show => show.poster_path && (<Link key={show.id} href={`/tv/${show.id}`}><a className="group"><Image src={`${IMAGE_BASE_URL}w500${show.poster_path}`} width={500} height={750} className="rounded-lg group-hover:scale-105 transition-transform duration-300" alt={show.name}/></a></Link>))}</div></div>}
                 </div>
             </div>
-            {isPlayerOpen && (
-                <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/90 backdrop-blur-sm animate-fade-in p-4">
-                    <div className="w-full max-w-6xl">
-                        <div className="flex justify-between items-center mb-4"><h3 className="text-xl font-bold text-white">{details.name} (S{selectedSeason} E{selectedEpisode})</h3><button onClick={() => setIsPlayerOpen(false)} className="text-white text-4xl leading-none hover:text-electric-blue-light transition-colors">&times;</button></div>
-                        <div className="aspect-video w-full">
-                            <iframe 
-                                src={`https://embed.vidsrc.pk/tv/${details.id}?s=${selectedSeason}&e=${selectedEpisode}`} 
-                                title={`Watch ${details.name}`} 
-                                frameBorder="0" 
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowFullScreen 
-                                className="w-full h-full rounded-lg shadow-2xl bg-black">
-                            </iframe>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {isPlayerOpen && (<div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/90 backdrop-blur-sm animate-fade-in p-4"><div className="w-full max-w-6xl"><div className="flex justify-between items-center mb-4"><h3 className="text-xl font-bold text-white">{details.name} (S{selectedSeason} E{selectedEpisode})</h3><button onClick={() => setIsPlayerOpen(false)} className="text-white text-4xl leading-none hover:text-electric-blue-light transition-colors">&times;</button></div><div className="aspect-video w-full"><iframe src={`https://embed.vidsrc.pk/tv/${details.id}?s=${selectedSeason}&e=${selectedEpisode}`} title={`Watch ${details.name}`} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="w-full h-full rounded-lg shadow-2xl bg-black"></iframe></div></div></div>)}
             {videoKey && <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/80" role="dialog" aria-modal="true"><div className="relative w-full max-w-4xl aspect-video bg-black rounded-lg overflow-hidden"><iframe className="w-full h-full" src={`https://www.youtube.com/embed/${videoKey}?autoplay=1`} title="YouTube video player" frameBorder="0" allow="autoplay; encrypted-media" allowFullScreen></iframe><button onClick={() => setVideoKey(null)} className="absolute top-2 right-2 text-3xl text-white" aria-label="Close video">&times;</button></div></div>}
         </>
     );
