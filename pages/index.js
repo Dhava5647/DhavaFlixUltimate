@@ -165,7 +165,7 @@ export default function DhavaFlixApp() {
                 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
                 <meta property="og:title" content="DhavaFlix – Watch Movies & Webseries" />
                 <meta property="og:description" content="A Netflix-style streaming site to explore the latest movies and TV shows." />
-                <meta property="og:image" content="https://i.imgur.com/5v2a22a.png" />
+                <meta property="og:image" content="https://dhavaflix.vercel.app/dhavaflix-banner.png" />
                 <meta property="og:url" content={SITE_URL} />
                 <meta name="twitter:card" content="summary_large_image" />
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
