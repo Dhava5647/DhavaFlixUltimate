@@ -2,25 +2,23 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
-
-// --- Firebase Imports (for User Profiles & My List) ---
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInAnonymously, onAuthStateChanged } from 'firebase/auth';
-import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, query, where } from 'firebase/firestore';
+import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, query, doc } from 'firebase/firestore';
 
 // --- Constants ---
 const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/";
-const SITE_URL = "https://dhavaflix.vercel.app"; // Your final website URL
+const SITE_URL = "https://dhavaflix.vercel.app"; 
 
 // --- Firebase Configuration ---
-// This is public information, it's safe to have here.
+// IMPORTANT: You must replace these with your own keys and add them to Vercel Environment Variables
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY, // We will set this in Vercel
-  authDomain: "dhavaflix.firebaseapp.com",
-  projectId: "dhavaflix",
-  storageBucket: "dhavaflix.appspot.com",
-  messagingSenderId: "SENDER_ID", // Replace with your actual sender ID if you use messaging
-  appId: "APP_ID" // Replace with your actual app ID
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 };
 
 let app, auth, db;
@@ -34,7 +32,6 @@ try {
 
 // --- Main App Component ---
 export default function DhavaFlixApp() {
-    // --- State Management ---
     const [user, setUser] = useState(null);
     const [myList, setMyList] = useState([]);
     const [continueWatching, setContinueWatching] = useState([]);
@@ -49,7 +46,6 @@ export default function DhavaFlixApp() {
     const [isHeaderScrolled, setIsHeaderScrolled] = useState(false);
     const [theme, setTheme] = useState('dark');
 
-    // --- Authentication & User Data ---
     useEffect(() => {
         if (!auth) return;
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -72,19 +68,7 @@ export default function DhavaFlixApp() {
         });
         return () => unsubscribe();
     }, [user]);
-
-    const handleToggleMyList = async (item) => {
-        if (!user) return;
-        const myListRef = collection(db, `users/${user.uid}/myList`);
-        const existingItem = myList.find(i => i.id === item.id);
-        if (existingItem) {
-            await deleteDoc(doc(db, `users/${user.uid}/myList`, existingItem.firestoreId));
-        } else {
-            await addDoc(myListRef, item);
-        }
-    };
     
-    // --- Local Storage Sync (for non-user specific data) ---
     useEffect(() => {
         try {
             setContinueWatching(JSON.parse(localStorage.getItem('dhavaflixContinueWatching')) || []);
@@ -177,13 +161,12 @@ export default function DhavaFlixApp() {
         <>
             <Head>
                 <title>DhavaFlix – Watch Movies & Webseries</title>
-                <meta name="description" content="A Netflix-style streaming site to explore the latest movies and TV shows, complete with trailers, ratings, and personalized lists."/>
+                <meta name="description" content="A Netflix-style streaming site to explore the latest movies and TV shows."/>
                 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
                 <meta property="og:title" content="DhavaFlix – Watch Movies & Webseries" />
                 <meta property="og:description" content="A Netflix-style streaming site to explore the latest movies and TV shows." />
                 <meta property="og:image" content="https://i.imgur.com/5v2a22a.png" />
                 <meta property="og:url" content={SITE_URL} />
-                <meta property="og:type" content="website" />
                 <meta name="twitter:card" content="summary_large_image" />
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
@@ -203,7 +186,7 @@ export default function DhavaFlixApp() {
         </>
     );
 }
-//... The rest of the sub-components are the same, but the WHOLE file needs to be replaced.
+// --- Sub-Components ---
 function MainContent({ currentView, isLoading, heroItem, contentData, myList, onPlayNow }) {
     if (isLoading && !['mylist', 'profile'].includes(currentView)) {
         return (<><section className="relative min-h-[50vh] md:min-h-[calc(85vh-5rem)] flex items-center justify-center themed-bg shimmer"></section><div className="py-8 md:py-12 space-y-8 md:space-y-12"><SkeletonLoader /></div></>);
@@ -224,10 +207,22 @@ function HeroSection({ item, onPlayNow }) {
     const detailUrl = `/${itemType}/${item.id}`;
     return (<motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative min-h-[50vh] md:min-h-[calc(85vh-5rem)] flex items-center"><div className="absolute inset-0"><img src={`${IMAGE_BASE_URL}w1280${item.backdrop_path}`} className="w-full h-full object-cover object-top" alt={fullItem.title} /><div className="absolute inset-0 hero-gradient"></div></div><div className="relative z-10 w-full max-w-7xl px-4 sm:px-6 lg:px-8"><div className="max-w-xl"><h2 className="text-3xl md:text-6xl font-bold hero-text-shadow">{fullItem.title}</h2><p className="mt-4 text-sm md:text-lg max-w-lg hero-text-shadow line-clamp-2 md:line-clamp-3">{item.overview}</p><div className="mt-6 flex space-x-4"><button onClick={() => onPlayNow(fullItem)} className="bg-white text-black font-semibold py-2 px-5 rounded flex items-center hover:bg-gray-200 transition duration-300 hover:scale-105">▶ Play</button><Link href={detailUrl}><a className="bg-gray-700/80 font-semibold py-2 px-5 rounded flex items-center hover:bg-gray-600/70 transition duration-300 hover:scale-105">More Info</a></Link></div></div></div></motion.section>);
 }
+// THIS IS THE CORRECTED COMPONENT
 function ContentRow({ row, onPlayNow }) {
     const rowRef = useRef(null);
     const scroll = (amount) => rowRef.current?.scrollBy({ left: amount, behavior: 'smooth' });
-    return (<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="carousel-category"><h2 className="text-lg sm:text-2xl font-bold mb-3 md:mb-4 px-4 sm:px-6 lg:px-8">{row.title}</h2><div className="carousel-container relative"><div ref={rowRef} className="carousel-wrapper flex overflow-x-auto pb-4 scrollbar-hide px-4 sm:px-6 lg:px-8 space-x-4">{row.items.map(item => item.poster_path && <ItemCard key={item.id} item={item} onPlayNow={onPlayNow}/>)}</div><button onClick={() => scroll(-rowRef.current.clientWidth)} className="carousel-arrow left-2 absolute top-0 bottom-0 px-4 bg-black/50 hidden md:flex items-center z-20 rounded-l-lg" aria-label="Scroll Left">&#9664;</button><button onClick={() => scroll(rowRef.current.clientWidth)} className="carousel-arrow right-2 absolute top-0 bottom-0 px-4 bg-black/50 hidden md:flex items-center z-20 rounded-r-lg" aria-label="Scroll Right">&#9654;</button></div></div>);
+    return (
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="carousel-category">
+            <h2 className="text-lg sm:text-2xl font-bold mb-3 md:mb-4 px-4 sm:px-6 lg:px-8">{row.title}</h2>
+            <div className="carousel-container relative">
+                <div ref={rowRef} className="carousel-wrapper flex overflow-x-auto pb-4 scrollbar-hide px-4 sm:px-6 lg:px-8 space-x-4">
+                    {row.items.map(item => item.poster_path && <ItemCard key={item.id} item={item} onPlayNow={onPlayNow}/>)}
+                </div>
+                <button onClick={() => scroll(-rowRef.current.clientWidth)} className="carousel-arrow left-2 absolute top-0 bottom-0 px-4 bg-black/50 hidden md:flex items-center z-20 rounded-l-lg" aria-label="Scroll Left">&#9664;</button>
+                <button onClick={() => scroll(rowRef.current.clientWidth)} className="carousel-arrow right-2 absolute top-0 bottom-0 px-4 bg-black/50 hidden md:flex items-center z-20 rounded-r-lg" aria-label="Scroll Right">&#9654;</button>
+            </div>
+        </motion.div>
+    );
 }
 function ItemCard({ item, onPlayNow }) {
     const itemType = item.media_type || (item.title ? 'movie' : 'tv') || item.type || 'movie';
@@ -237,13 +232,8 @@ function ItemCard({ item, onPlayNow }) {
 }
 function StreamingPlayer({ item, onClose }) {
     const isMovie = item.type === 'movie';
-    const playerUrl = isMovie 
-        ? `https://embed.vidsrc.pk/movie/${item.id}`
-        : `https://embed.vidsrc.pk/tv/${item.id}`;
-    useEffect(() => {
-        document.body.style.overflow = 'hidden';
-        return () => { document.body.style.overflow = 'auto'; };
-    }, []);
+    const playerUrl = isMovie ? `https://embed.vidsrc.pk/movie/${item.id}` : `https://embed.vidsrc.pk/tv/${item.id}`;
+    useEffect(() => { document.body.style.overflow = 'hidden'; return () => { document.body.style.overflow = 'auto'; }; }, []);
     return (<div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/90 backdrop-blur-sm animate-fade-in p-4"><div className="w-full max-w-6xl"><div className="flex justify-between items-center mb-4"><h3 className="text-xl font-bold text-white">{item.title}</h3><button onClick={onClose} className="text-white text-4xl leading-none hover:text-electric-blue-light transition-colors">&times;</button></div><div className="aspect-video w-full"><iframe src={playerUrl} title={`Watch ${item.title}`} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="w-full h-full rounded-lg shadow-2xl bg-black"></iframe></div></div></div>);
 }
 function SearchOverlay({ isOpen, onClose, onSearch, results, onPlayNow }) {
