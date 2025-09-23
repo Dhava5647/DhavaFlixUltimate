@@ -122,7 +122,8 @@ export default function DhavaFlixApp() {
                 {/* --- Open Graph Meta Tags for Link Previews (FIXED) --- */}
                 <meta property="og:title" content="DhavaFlix – Watch Movies & Webseries" />
                 <meta property="og:description" content="A Netflix-style streaming site to explore the latest movies and TV shows." />
-                <meta property="og:image" content="https://i.imgur.com/5v2a22a.png" />
+                <meta property="og:image" content="https://dhavaflix.vercel.app/dhavaflix-banner.png" />
+        
                 <meta property="og:url" content={SITE_URL} />
                 <meta property="og:type" content="website" />
                 <meta name="twitter:card" content="summary_large_image" />
