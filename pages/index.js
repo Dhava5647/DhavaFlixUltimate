@@ -159,24 +159,19 @@ export default function DhavaFlixApp() {
     return (
         <>
             <Head>
-                {/* --- SEO FIX 1: UPDATE HEAD SECTION --- */}
+                {/* --- SEO CHECKLIST ITEM 1: UPDATE HEAD SECTION --- */}
                 <title>DhavaFlix – Watch Movies & Webseries Online Free</title>
                 <meta name="description" content="DhavaFlix lets you stream movies and webseries online for free. Browse popular titles, trending shows, and watch the latest releases in HD." />
                 <link rel="canonical" href="https://dhavaflix.vercel.app" />
-                
-                {/* Open Graph (Facebook, WhatsApp, etc.) */}
                 <meta property="og:title" content="DhavaFlix – Watch Movies & Webseries Online Free" />
                 <meta property="og:description" content="Stream trending movies and webseries online in HD for free on DhavaFlix." />
                 <meta property="og:url" content="https://dhavaflix.vercel.app" />
                 <meta property="og:type" content="website" />
-                <meta property="og:image" content="https://dhavaflix.vercel.app/logo.png" /> 
-
-                {/* Twitter Card */}
+                <meta property="og:image" content="https://dhavaflix.vercel.app/logo.png" />
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content="DhavaFlix – Watch Movies & Webseries Online Free" />
                 <meta name="twitter:description" content="Browse popular movies and trending shows. Watch free online in HD." />
                 <meta name="twitter:image" content="https://dhavaflix.vercel.app/logo.png" />
-                
                 {/* --- END SEO FIX --- */}
 
                 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -233,7 +228,7 @@ function HeroSection({ item, onPlayNow }) {
     const fullItem = {...item, type: itemType, title: item.title || item.name };
     const detailUrl = `/${itemType}/${item.id}`;
     return (<motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative min-h-[50vh] md:min-h-[calc(85vh-5rem)] flex items-center"><div className="absolute inset-0"><img src={`${IMAGE_BASE_URL}w1280${item.backdrop_path}`} className="w-full h-full object-cover object-top" alt={fullItem.title} /><div className="absolute inset-0 hero-gradient"></div></div><div className="relative z-10 w-full max-w-7xl px-4 sm:px-6 lg:px-8"><div className="max-w-xl">
-        {/* --- SEO FIX 2: UPDATE HERO H2 to H1 --- */}
+        {/* --- SEO CHECKLIST ITEM 2: UPDATE HERO H2 to H1 --- */}
         <h1 className="text-3xl md:text-6xl font-bold hero-text-shadow">{fullItem.title}</h1>
         <p className="mt-4 text-sm md:text-lg max-w-lg hero-text-shadow line-clamp-2 md:line-clamp-3">{item.overview}</p><div className="mt-6 flex space-x-4"><button onClick={() => onPlayNow(fullItem)} className="bg-white text-black font-semibold py-2 px-5 rounded flex items-center hover:bg-gray-200 transition duration-300 hover:scale-105">▶ Play</button><Link href={detailUrl}><a className="bg-gray-700/80 font-semibold py-2 px-5 rounded flex items-center hover:bg-gray-600/70 transition duration-300 hover:scale-105">More Info</a></Link></div></div></div></motion.section>);
 }
