@@ -1,14 +1,41 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { motion } from 'framer-motion';
+
+// --- Firebase Imports (for User Profiles & My List) ---
+import { initializeApp } from 'firebase/app';
+import { getAuth, signInAnonymously, onAuthStateChanged } from 'firebase/auth';
+import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, query, where } from 'firebase/firestore';
 
 // --- Constants ---
 const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/";
 const SITE_URL = "https://dhavaflix.vercel.app"; // Your final website URL
 
+// --- Firebase Configuration ---
+// This is public information, it's safe to have here.
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY, // We will set this in Vercel
+  authDomain: "dhavaflix.firebaseapp.com",
+  projectId: "dhavaflix",
+  storageBucket: "dhavaflix.appspot.com",
+  messagingSenderId: "SENDER_ID", // Replace with your actual sender ID if you use messaging
+  appId: "APP_ID" // Replace with your actual app ID
+};
+
+let app, auth, db;
+try {
+  app = initializeApp(firebaseConfig);
+  auth = getAuth(app);
+  db = getFirestore(app);
+} catch (error) {
+  console.error("Firebase initialization error:", error);
+}
+
 // --- Main App Component ---
-// This is the final, stable version with correct link previews.
 export default function DhavaFlixApp() {
+    // --- State Management ---
+    const [user, setUser] = useState(null);
     const [myList, setMyList] = useState([]);
     const [continueWatching, setContinueWatching] = useState([]);
     const [heroItem, setHeroItem] = useState(null);
@@ -22,9 +49,44 @@ export default function DhavaFlixApp() {
     const [isHeaderScrolled, setIsHeaderScrolled] = useState(false);
     const [theme, setTheme] = useState('dark');
 
+    // --- Authentication & User Data ---
+    useEffect(() => {
+        if (!auth) return;
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            if (currentUser) {
+                setUser(currentUser);
+            } else {
+                signInAnonymously(auth).catch(error => console.error("Anonymous sign-in failed:", error));
+            }
+        });
+        return () => unsubscribe();
+    }, []);
+
+    useEffect(() => {
+        if (!user || !db) return;
+        const myListRef = collection(db, `users/${user.uid}/myList`);
+        const q = query(myListRef);
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const list = snapshot.docs.map(doc => ({ ...doc.data(), firestoreId: doc.id }));
+            setMyList(list);
+        });
+        return () => unsubscribe();
+    }, [user]);
+
+    const handleToggleMyList = async (item) => {
+        if (!user) return;
+        const myListRef = collection(db, `users/${user.uid}/myList`);
+        const existingItem = myList.find(i => i.id === item.id);
+        if (existingItem) {
+            await deleteDoc(doc(db, `users/${user.uid}/myList`, existingItem.firestoreId));
+        } else {
+            await addDoc(myListRef, item);
+        }
+    };
+    
+    // --- Local Storage Sync (for non-user specific data) ---
     useEffect(() => {
         try {
-            setMyList(JSON.parse(localStorage.getItem('dhavaflixMyList')) || []);
             setContinueWatching(JSON.parse(localStorage.getItem('dhavaflixContinueWatching')) || []);
             const savedTheme = localStorage.getItem('theme') || 'dark';
             setTheme(savedTheme);
@@ -37,8 +99,7 @@ export default function DhavaFlixApp() {
     };
 
     const fetchApi = useCallback(async (path, params = "") => {
-        const queryParams = new URLSearchParams(params.replace(/^&/, '')).toString();
-        const url = `/api/tmdb?path=${encodeURIComponent(path)}&${queryParams}`;
+        const url = `/api/tmdb?path=${encodeURIComponent(path)}&${new URLSearchParams(params.replace(/^&/, ''))}`;
         try {
             const res = await fetch(url);
             if (!res.ok) throw new Error(`API proxy error: ${res.status}`);
@@ -72,9 +133,9 @@ export default function DhavaFlixApp() {
 
     useEffect(() => {
         const viewConfigs = {
-            home: { heroEndpoint: 'trending/all/week', categories: [{ title: "Trending This Week", endpoint: "trending/all/week" }, { title: "Popular in India", endpoint: "discover/movie", params: "&region=IN&sort_by=popularity.desc&with_original_language=hi|te|ta" }, { title: "Popular TV Shows", endpoint: "tv/popular", params: "&region=IN" }, { title: "Top Rated Movies", endpoint: "movie/top_rated" }], showContinueWatching: true },
-            movies: { heroEndpoint: 'movie/popular', categories: [{ title: "Now Playing in Theaters", endpoint: "movie/now_playing", params: "&region=IN" }, { title: "Action Movies", endpoint: "discover/movie", params: "&with_genres=28" }, { title: "Comedies", endpoint: "discover/movie", params: "&with_genres=35" }, { title: "Horror", endpoint: "discover/movie", params: "&with_genres=27" }, { title: "Top Rated", endpoint: "movie/top_rated" }, { title: "Upcoming", endpoint: "movie/upcoming", params: "&region=IN" }] },
-            tv: { heroEndpoint: 'tv/popular', categories: [{ title: "Airing Today", endpoint: "tv/airing_today" }, { title: "Animation", endpoint: "discover/tv", params: "&with_genres=16" }, { title: "Crime Dramas", endpoint: "discover/tv", params: "&with_genres=80" }, { title: "Documentaries", endpoint: "discover/tv", params: "&with_genres=99" }, { title: "Sci-Fi & Fantasy", endpoint: "discover/tv", params: "&with_genres=10765" }, { title: "Top Rated Shows", endpoint: "tv/top_rated" }] }
+            home: { heroEndpoint: 'trending/all/week', categories: [{ title: "Trending This Week", endpoint: "trending/all/week" }, { title: "Popular in India", endpoint: "discover/movie", params: "&region=IN&sort_by=popularity.desc" }, { title: "Popular TV Shows", endpoint: "tv/popular", params: "&region=IN" }, { title: "Top Rated Movies", endpoint: "movie/top_rated" }], showContinueWatching: true },
+            movies: { heroEndpoint: 'movie/popular', categories: [{ title: "Now Playing", endpoint: "movie/now_playing", params: "&region=IN" }, { title: "Action", endpoint: "discover/movie", params: "&with_genres=28" }, { title: "Comedy", endpoint: "discover/movie", params: "&with_genres=35" }, { title: "Horror", endpoint: "discover/movie", params: "&with_genres=27" }, { title: "Top Rated", endpoint: "movie/top_rated" }] },
+            tv: { heroEndpoint: 'tv/popular', categories: [{ title: "Airing Today", endpoint: "tv/airing_today" }, { title: "Animation", endpoint: "discover/tv", params: "&with_genres=16" }, { title: "Crime", endpoint: "discover/tv", params: "&with_genres=80" }, { title: "Sci-Fi & Fantasy", endpoint: "discover/tv", params: "&with_genres=10765" }, { title: "Top Rated", endpoint: "tv/top_rated" }] }
         };
         if (viewConfigs[currentView]) fetchAndSetContent(viewConfigs[currentView]);
         else setIsLoading(false);
@@ -118,16 +179,12 @@ export default function DhavaFlixApp() {
                 <title>DhavaFlix – Watch Movies & Webseries</title>
                 <meta name="description" content="A Netflix-style streaming site to explore the latest movies and TV shows, complete with trailers, ratings, and personalized lists."/>
                 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-                
-                {/* --- Open Graph Meta Tags for Link Previews (FIXED) --- */}
                 <meta property="og:title" content="DhavaFlix – Watch Movies & Webseries" />
                 <meta property="og:description" content="A Netflix-style streaming site to explore the latest movies and TV shows." />
-                <meta property="og:image" content="https://dhavaflix.vercel.app/dhavaflix-banner.png" />
-        
+                <meta property="og:image" content="https://i.imgur.com/5v2a22a.png" />
                 <meta property="og:url" content={SITE_URL} />
                 <meta property="og:type" content="website" />
                 <meta name="twitter:card" content="summary_large_image" />
-
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
                 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -146,7 +203,7 @@ export default function DhavaFlixApp() {
         </>
     );
 }
-//... The rest of the sub-components remain the same.
+//... The rest of the sub-components are the same, but the WHOLE file needs to be replaced.
 function MainContent({ currentView, isLoading, heroItem, contentData, myList, onPlayNow }) {
     if (isLoading && !['mylist', 'profile'].includes(currentView)) {
         return (<><section className="relative min-h-[50vh] md:min-h-[calc(85vh-5rem)] flex items-center justify-center themed-bg shimmer"></section><div className="py-8 md:py-12 space-y-8 md:space-y-12"><SkeletonLoader /></div></>);
@@ -165,18 +222,18 @@ function HeroSection({ item, onPlayNow }) {
     const itemType = item.media_type || (item.title ? 'movie' : 'tv');
     const fullItem = {...item, type: itemType, title: item.title || item.name };
     const detailUrl = `/${itemType}/${item.id}`;
-    return (<section className="relative min-h-[50vh] md:min-h-[calc(85vh-5rem)] flex items-center"><div className="absolute inset-0"><img src={`${IMAGE_BASE_URL}w1280${item.backdrop_path}`} className="w-full h-full object-cover object-top" alt={fullItem.title} /><div className="absolute inset-0 hero-gradient"></div></div><div className="relative z-10 w-full max-w-7xl px-4 sm:px-6 lg:px-8"><div className="max-w-xl"><h2 className="text-3xl md:text-6xl font-bold hero-text-shadow">{fullItem.title}</h2><p className="mt-4 text-sm md:text-lg max-w-lg hero-text-shadow line-clamp-2 md:line-clamp-3">{item.overview}</p><div className="mt-6 flex space-x-4"><button onClick={() => onPlayNow(fullItem)} className="bg-white text-black font-semibold py-2 px-5 rounded flex items-center hover:bg-gray-200 transition duration-300 hover:scale-105">▶ Play</button><Link href={detailUrl}><a className="bg-gray-700/80 font-semibold py-2 px-5 rounded flex items-center hover:bg-gray-600/70 transition duration-300 hover:scale-105">More Info</a></Link></div></div></div></section>);
+    return (<motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative min-h-[50vh] md:min-h-[calc(85vh-5rem)] flex items-center"><div className="absolute inset-0"><img src={`${IMAGE_BASE_URL}w1280${item.backdrop_path}`} className="w-full h-full object-cover object-top" alt={fullItem.title} /><div className="absolute inset-0 hero-gradient"></div></div><div className="relative z-10 w-full max-w-7xl px-4 sm:px-6 lg:px-8"><div className="max-w-xl"><h2 className="text-3xl md:text-6xl font-bold hero-text-shadow">{fullItem.title}</h2><p className="mt-4 text-sm md:text-lg max-w-lg hero-text-shadow line-clamp-2 md:line-clamp-3">{item.overview}</p><div className="mt-6 flex space-x-4"><button onClick={() => onPlayNow(fullItem)} className="bg-white text-black font-semibold py-2 px-5 rounded flex items-center hover:bg-gray-200 transition duration-300 hover:scale-105">▶ Play</button><Link href={detailUrl}><a className="bg-gray-700/80 font-semibold py-2 px-5 rounded flex items-center hover:bg-gray-600/70 transition duration-300 hover:scale-105">More Info</a></Link></div></div></div></motion.section>);
 }
 function ContentRow({ row, onPlayNow }) {
     const rowRef = useRef(null);
     const scroll = (amount) => rowRef.current?.scrollBy({ left: amount, behavior: 'smooth' });
-    return (<div className="carousel-category"><h2 className="text-lg sm:text-2xl font-bold mb-3 md:mb-4 px-4 sm:px-6 lg:px-8">{row.title}</h2><div className="carousel-container relative"><div ref={rowRef} className="carousel-wrapper flex overflow-x-auto pb-4 scrollbar-hide px-4 sm:px-6 lg:px-8 space-x-4">{row.items.map(item => item.poster_path && <ItemCard key={item.id} item={item} onPlayNow={onPlayNow}/>)}</div><button onClick={() => scroll(-rowRef.current.clientWidth)} className="carousel-arrow left-2 absolute top-0 bottom-0 px-4 bg-black/50 hidden md:flex items-center z-20 rounded-l-lg" aria-label="Scroll Left">&#9664;</button><button onClick={() => scroll(rowRef.current.clientWidth)} className="carousel-arrow right-2 absolute top-0 bottom-0 px-4 bg-black/50 hidden md:flex items-center z-20 rounded-r-lg" aria-label="Scroll Right">&#9654;</button></div></div>);
+    return (<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="carousel-category"><h2 className="text-lg sm:text-2xl font-bold mb-3 md:mb-4 px-4 sm:px-6 lg:px-8">{row.title}</h2><div className="carousel-container relative"><div ref={rowRef} className="carousel-wrapper flex overflow-x-auto pb-4 scrollbar-hide px-4 sm:px-6 lg:px-8 space-x-4">{row.items.map(item => item.poster_path && <ItemCard key={item.id} item={item} onPlayNow={onPlayNow}/>)}</div><button onClick={() => scroll(-rowRef.current.clientWidth)} className="carousel-arrow left-2 absolute top-0 bottom-0 px-4 bg-black/50 hidden md:flex items-center z-20 rounded-l-lg" aria-label="Scroll Left">&#9664;</button><button onClick={() => scroll(rowRef.current.clientWidth)} className="carousel-arrow right-2 absolute top-0 bottom-0 px-4 bg-black/50 hidden md:flex items-center z-20 rounded-r-lg" aria-label="Scroll Right">&#9654;</button></div></div>);
 }
 function ItemCard({ item, onPlayNow }) {
     const itemType = item.media_type || (item.title ? 'movie' : 'tv') || item.type || 'movie';
     const fullItem = {...item, type: itemType, title: item.title || item.name };
     const detailUrl = `/${itemType}/${item.id}`;
-    return (<div className="group flex-shrink-0 w-36 sm:w-48 md:w-56 relative"><div className="movie-card w-full aspect-[2/3] themed-bg rounded-lg overflow-hidden relative"><img src={`${IMAGE_BASE_URL}w500${item.poster_path}`} alt={fullItem.title} className="w-full h-full object-cover" loading="lazy" /></div><div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex flex-col items-center justify-center p-2 text-center z-20"><h3 className="font-bold text-sm mb-3">{fullItem.title}</h3><button onClick={() => onPlayNow(fullItem)} className="w-full bg-white text-black text-sm font-semibold py-2 rounded mb-2 transition hover:scale-105">▶ Play</button><Link href={detailUrl}><a className="w-full bg-gray-700/80 text-sm font-semibold py-2 rounded transition hover:scale-105 block">ℹ More Info</a></Link></div></div>);
+    return (<motion.div whileHover={{ scale: 1.05 }} className="group flex-shrink-0 w-36 sm:w-48 md:w-56 relative"><div className="movie-card w-full aspect-[2/3] themed-bg rounded-lg overflow-hidden relative"><img src={`${IMAGE_BASE_URL}w500${item.poster_path}`} alt={fullItem.title} className="w-full h-full object-cover" loading="lazy" /></div><div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex flex-col items-center justify-center p-2 text-center z-20"><h3 className="font-bold text-sm mb-3">{fullItem.title}</h3><button onClick={() => onPlayNow(fullItem)} className="w-full bg-white text-black text-sm font-semibold py-2 rounded mb-2 transition hover:scale-105">▶ Play</button><Link href={detailUrl}><a className="w-full bg-gray-700/80 text-sm font-semibold py-2 rounded transition hover:scale-105 block">ℹ More Info</a></Link></div></motion.div>);
 }
 function StreamingPlayer({ item, onClose }) {
     const isMovie = item.type === 'movie';
