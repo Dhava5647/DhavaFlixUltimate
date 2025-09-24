@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://dhavaflix.vercel.app/sitemap.xml
+Sitemap: https://dhavaflix.myvnc.com/sitemap.xml
