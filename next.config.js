@@ -1,16 +1,23 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-reactStrictMode: true,
+  reactStrictMode: true,
+
+  // 👇 The array must be returned from inside this function
   async redirects() {
     return [
       {
-        source: '/movies',                    // old path
-        destination: 'https://dhavaflix.myvnc.com/movies',  // new path
-        permanent: true,                      // makes it a 301 redirect
+        source: '/movies',
+        destination: 'https://dhavaflix.myvnc.com/movies',
+        permanent: true,
       },
       {
         source: '/tv-shows',
         destination: 'https://dhavaflix.myvnc.com/tv-shows',
+        permanent: true, // Added this line for correct SEO
+      },
+    ];
+  },
+
   // This is the important part that fixes the images
   images: {
     domains: ['image.tmdb.org'],
