@@ -1,4 +1,4 @@
-Import Head from 'next/head';
+import Head from 'next/head';
 import Link from 'next/link';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
@@ -284,4 +284,5 @@ function ProfileSection({ title, items, onClear, emptyText }) {
 function SkeletonLoader() {
     return (Array.from({ length: 4 }).map((_, i) => (<div key={i} className="px-4 sm:px-6 lg:px-8"><div className="h-8 w-1/3 themed-bg shimmer rounded-lg shadow-sm mb-4"></div><div className="flex space-x-4 overflow-hidden">{Array.from({ length: 5 }).map((_, j) => (<div key={j} className="flex-shrink-0 w-36 sm:w-48 md:w-56"><div className="w-full aspect-[2/3] themed-bg shimmer rounded-lg shadow-sm"></div></div>))}</div></div>)));
 }
+
 
