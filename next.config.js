@@ -1,5 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+   async redirects() {
+    return [
+      {
+        source: '/movies',                    // old path
+        destination: 'https://dhavaflix.myvnc.com/movies',  // new path
+        permanent: true,                      // makes it a 301 redirect
+      },
+      {
+        source: '/tv-shows',
+        destination: 'https://dhavaflix.myvnc.com/tv-shows',
   reactStrictMode: true,
   
   // This is the important part that fixes the images
