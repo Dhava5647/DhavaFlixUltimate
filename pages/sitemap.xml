@@ -1,4 +1,4 @@
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://dhavaflix.vercel.app';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://dhavaflix.myvnc.com';
 
 async function generateSitemap() {
   try {
