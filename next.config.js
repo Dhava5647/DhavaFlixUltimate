@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-   async redirects() {
+reactStrictMode: true,
+  async redirects() {
     return [
       {
         source: '/movies',                    // old path
@@ -10,8 +11,6 @@ const nextConfig = {
       {
         source: '/tv-shows',
         destination: 'https://dhavaflix.myvnc.com/tv-shows',
-  reactStrictMode: true,
-  
   // This is the important part that fixes the images
   images: {
     domains: ['image.tmdb.org'],
