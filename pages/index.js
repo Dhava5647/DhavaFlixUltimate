@@ -8,7 +8,7 @@ import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, query, doc } f
 
 // --- Constants ---
 const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/";
-const SITE_URL = "https://dhavaflix.vercel.app"; 
+const SITE_URL = "https://dhavaflix.myvnc.com"; 
 
 // --- Firebase Configuration ---
 const firebaseConfig = {
@@ -169,13 +169,13 @@ export default function DhavaFlixApp() {
                 <meta property="og:description" content="Stream trending movies and webseries online in HD for free on DhavaFlix." />
                 <meta property="og:url" content="https://dhavaflix.myvnc.com" />
                 <meta property="og:type" content="website" />
-                <meta property="og:image" content="https://dhavaflix.vercel.app/logo.png" /> 
+                <meta property="og:image" content="https://dhavaflix.myvnc.com/logo.png" /> 
 
                 {/* Twitter Card */}
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content="DhavaFlix – Watch Movies & Webseries Online Free" />
                 <meta name="twitter:description" content="Browse popular movies and trending shows. Watch free online in HD." />
-                <meta name="twitter:image" content="https://dhavaflix.vercel.app/logo.png" />
+                <meta name="twitter:image" content="https://dhavaflix.myvnc.com/logo.png" />
                 
                 {/* --- END SEO FIX --- */}
 
@@ -190,7 +190,7 @@ export default function DhavaFlixApp() {
                       "@context": "https://schema.org",
                       "@type": "WebSite",
                       "name": "DhavaFlix",
-                      "url": "https://dhavaflix.vercel.app",
+                      "url": "https://dhavaflix.myvnc.com",
                       "potentialAction": {
                         "@type": "SearchAction",
                         "target": "https://dhavaflix.vercel.app/search?q={search_term_string}",
