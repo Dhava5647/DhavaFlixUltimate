@@ -162,12 +162,12 @@ export default function DhavaFlixApp() {
                 {/* --- SEO CHECKLIST ITEM 1: UPDATE HEAD SECTION --- */}
                 <title>DhavaFlix – Watch Movies & Webseries Online Free</title>
                 <meta name="description" content="DhavaFlix lets you stream movies and webseries online for free. Browse popular titles, trending shows, and watch the latest releases in HD." />
-                <link rel="canonical" href="https://dhavaflix.vercel.app" />
+                <link rel="canonical" href="https://dhavaflix.myvnc.com" />
                 
                 {/* Open Graph (Facebook, WhatsApp, etc.) */}
                 <meta property="og:title" content="DhavaFlix – Watch Movies & Webseries Online Free" />
                 <meta property="og:description" content="Stream trending movies and webseries online in HD for free on DhavaFlix." />
-                <meta property="og:url" content="https://dhavaflix.vercel.app" />
+                <meta property="og:url" content="https://dhavaflix.myvnc.com" />
                 <meta property="og:type" content="website" />
                 <meta property="og:image" content="https://dhavaflix.vercel.app/logo.png" /> 
 
