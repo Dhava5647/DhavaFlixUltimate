@@ -163,20 +163,20 @@ export default function DhavaFlixApp() {
                 <title>DhavaFlix – Watch Movies & Webseries Online Free</title>
                 <meta name="description" content="DhavaFlix lets you stream movies and webseries online for free. Browse popular titles, trending shows, and watch the latest releases in HD." />
                 <meta name="google-site-verification" content="gbf1qaQAd9ekTyoAvM5CkeZ1X8TvBlmEQWMKjVh5F5s" />
-      <link rel="canonical" href="https://dhavaflix.myvnc.com" />
+      <link rel="canonical" href="https://dhavaflix.qzz.io" />
                 
                 {/* Open Graph (Facebook, WhatsApp, etc.) */}
                 <meta property="og:title" content="DhavaFlix – Watch Movies & Webseries Online Free" />
                 <meta property="og:description" content="Stream trending movies and webseries online in HD for free on DhavaFlix." />
-                <meta property="og:url" content="https://dhavaflix.myvnc.com" />
+                <meta property="og:url" content="https://dhavaflix.qzz.io" />
                 <meta property="og:type" content="website" />
-                <meta property="og:image" content="https://dhavaflix.myvnc.com/logo.png" /> 
+                <meta property="og:image" content="https://dhavaflix.qzz.io/logo.png" /> 
 
                 {/* Twitter Card */}
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content="DhavaFlix – Watch Movies & Webseries Online Free" />
                 <meta name="twitter:description" content="Browse popular movies and trending shows. Watch free online in HD." />
-                <meta name="twitter:image" content="https://dhavaflix.myvnc.com/logo.png" />
+                <meta name="twitter:image" content="https://dhavaflix.qzz.io/logo.png" />
                 
                 {/* --- END SEO FIX --- */}
 
