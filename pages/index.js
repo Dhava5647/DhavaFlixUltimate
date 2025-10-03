@@ -162,8 +162,7 @@ export default function DhavaFlixApp() {
                 {/* --- SEO CHECKLIST ITEM 1: UPDATE HEAD SECTION --- */}
                 <title>DhavaFlix – Watch Movies & Webseries Online Free</title>
                 <meta name="description" content="DhavaFlix lets you stream movies and webseries online for free. Browse popular titles, trending shows, and watch the latest releases in HD." />
-         <meta name="google-site-verification" content="94P0NGBV5ic9WUvy91OQl6BXswgsUVREHcqZ94lIW3M" />     
-      <meta name="google-site-verification" content="gbf1qaQAd9ekTyoAvM5CkeZ1X8TvBlmEQWMKjVh5F5s" />
+         <meta name="google-site-verification" content="94P0NGBV5ic9WUvy91OQl6BXswgsUVREHcqZ94lIW3M" />    
       <link rel="canonical" href="https://dhavaflix.qzz.io" />
                 
                 {/* Open Graph (Facebook, WhatsApp, etc.) */}
