@@ -61,7 +61,7 @@ export default function MovieDetailsPage() {
                 <meta property="og:title" content={`${details.title} – DhavaFlix`} />
                 <meta property="og:description" content={details.overview.substring(0, 160) + '...'} />
                 <meta property="og:image" content={`${IMAGE_BASE_URL}w500${details.poster_path}`} />
-                <meta property="og:url" content={`https://dhavaflix.myvnc.com/${id}`} />
+                <meta property="og:url" content={`https://dhavaflix.qzz.io/${id}`} />
             </Head>
             <div className="themed-bg min-h-screen">
                 {/* ... rest of the component is the same */}
