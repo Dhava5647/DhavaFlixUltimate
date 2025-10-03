@@ -7,12 +7,12 @@ const nextConfig = {
     return [
       {
         source: '/movies',
-        destination: 'https://dhavaflix.myvnc.com/movies',
+        destination: 'https://dhavaflix.qzz.io/movies',
         permanent: true,
       },
       {
         source: '/tv-shows',
-        destination: 'https://dhavaflix.myvnc.com/tv-shows',
+        destination: 'https://dhavaflix.qzz.io/tv-shows',
         permanent: true, // Added this line for correct SEO
       },
     ];
